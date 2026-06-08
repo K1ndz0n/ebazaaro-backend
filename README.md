@@ -1,0 +1,1 @@
+## Docs: https://appealing-adventure-production-07d7.up.railway.app/swagger-ui/index.html
