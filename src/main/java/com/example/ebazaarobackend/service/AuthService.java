@@ -20,7 +20,7 @@ import java.time.Instant;
 
 @Service
 public class AuthService {
-    @Value("${RECAPTCHA_KEY}")
+    @Value("${recaptcha.secret.key}")
     private String recaptchaSecretKey;
 
     @Autowired

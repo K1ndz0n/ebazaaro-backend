@@ -75,15 +75,40 @@ public class PostSpec {
         return (root, query, cb) -> {
             if (lat == null || lng == null || radius == null || radius == 0) return null;
 
-            root.join("city", JoinType.LEFT);
+            Join<Post, City> city = root.join("city", JoinType.LEFT);
 
-            Expression<Double> distance = cb.function(
-                    "haversine_distance", Double.class,
-                    root.get("city").get("latitude"),
-                    root.get("city").get("longitude"),
-                    cb.literal(lat),
-                    cb.literal(lng)
-            );
+            Expression<Double> lat1 = city.get("latitude");
+            Expression<Double> lon1 = city.get("longitude");
+
+            Expression<Double> lat2 = cb.literal(lat.doubleValue());
+            Expression<Double> lon2 = cb.literal(lng.doubleValue());
+
+            Expression<Double> radLat1 = cb.function("radians", Double.class, lat1);
+            Expression<Double> radLon1 = cb.function("radians", Double.class, lon1);
+            Expression<Double> radLat2 = cb.function("radians", Double.class, lat2);
+            Expression<Double> radLon2 = cb.function("radians", Double.class, lon2);
+
+            Expression<Double> cosLat2 = cb.function("cos", Double.class, radLat2);
+            Expression<Double> cosLat1 = cb.function("cos", Double.class, radLat1);
+            Expression<Double> sinLat2 = cb.function("sin", Double.class, radLat2);
+            Expression<Double> sinLat1 = cb.function("sin", Double.class, radLat1);
+
+            Expression<Double> cosLonDiff =
+                    cb.function("cos",
+                            Double.class,
+                            cb.diff(radLon1, radLon2));
+
+            Expression<Double> acosInput =
+                    cb.sum(
+                            cb.prod(cosLat2, cb.prod(cosLat1, cosLonDiff)),
+                            cb.prod(sinLat2, sinLat1)
+                    );
+
+            Expression<Double> distance =
+                    cb.prod(
+                            cb.literal(6371.0),
+                            cb.function("acos", Double.class, acosInput)
+                    );
 
             return cb.lessThanOrEqualTo(distance, radius.doubleValue());
         };

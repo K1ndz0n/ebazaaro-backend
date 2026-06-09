@@ -34,8 +34,6 @@ public class PostService {
     @Autowired
     private StorageService storageService;
     @Autowired
-    private PhotoRepository photoRepository;
-    @Autowired
     private ChatRepository chatRepository;
 
     @Transactional(readOnly = true)
@@ -127,10 +125,10 @@ public class PostService {
 
     public Pageable getSortedPageable(Pageable pageable, PostFilter filter) {
         Sort sort = switch (filter.getSort() != null ? filter.getSort() : "newest") {
-            case "price_asc"  -> Sort.by("price").ascending();
+            case "price_asc" -> Sort.by("price").ascending();
             case "price_desc" -> Sort.by("price").descending();
-            case "oldest"     -> Sort.by("createdAt").ascending();
-            default           -> Sort.by("createdAt").descending();
+            case "oldest" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("createdAt").descending();
         };
 
         return PageRequest.of(

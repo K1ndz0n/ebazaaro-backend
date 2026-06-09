@@ -35,7 +35,7 @@ public class ChatService {
         if (post.getUser().getId().equals(buyer.getId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie możesz stworzyć czatu sam ze sobą!");
 
-        if (chatRepository.existsByPostAndBuyerAndSeller(post, buyer, post.getUser()))
+        if (chatRepository.existsByPostAndBuyer(post, buyer))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Taki czat już istnieje");
 
         var chat = new Chat();

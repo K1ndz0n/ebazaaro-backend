@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
-    boolean existsByPostAndBuyerAndSeller(Post post, User buyer, User seller);
+    boolean existsByPostAndBuyer(Post post, User buyer);
     List<Chat> findAllBySellerOrBuyer(User seller, User buyer);
     List<Chat> findAllByPost(Post post);
 }
