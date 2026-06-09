@@ -3,10 +3,7 @@ package com.example.ebazaarobackend.repository;
 import com.example.ebazaarobackend.TestDataFactory;
 import com.example.ebazaarobackend.TestcontainersConfig;
 import com.example.ebazaarobackend.dto.PostFilter;
-import com.example.ebazaarobackend.model.Category;
-import com.example.ebazaarobackend.model.City;
-import com.example.ebazaarobackend.model.Post;
-import com.example.ebazaarobackend.model.User;
+import com.example.ebazaarobackend.model.*;
 import com.example.ebazaarobackend.spec.PostSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,10 +65,11 @@ public class PostRepositoryTests {
 
     @Test
     void shouldFindAllPostsWithEmptySpecificationAndPagination() {
-        Specification<Post> emptySpec = (root, query, cb) -> null;
+        PostFilter testFilter = new PostFilter();
+        Specification<Post> spec = PostSpec.withFilters(testFilter, null, null);
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 
-        Page<Post> result = postRepository.findAll(emptySpec, pageable);
+        Page<Post> result = postRepository.findAll(spec, pageable);
 
         assertThat(result.getContent()).hasSize(3);
     }
@@ -120,6 +118,22 @@ public class PostRepositoryTests {
     void shouldFindAllPostsWithSpecifiedCityAndRadius() {
         PostFilter testFilter = new PostFilter();
         testFilter.setCityId(gdansk.getId());
+        testFilter.setRadius(200f);
+        Specification<Post> spec = PostSpec.withFilters(testFilter, gdansk.getLatitude(), gdansk.getLongitude());
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+        Page<Post> result = postRepository.findAll(spec, pageable);
+
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).getCity().getName()).isNotEqualTo(warszawa.getName());
+        assertThat(result.getContent().get(1).getCity().getName()).isNotEqualTo(warszawa.getName());
+    }
+
+    @Test
+    void shouldFindAllPostsWithUserLocalizationAndRadius() {
+        PostFilter testFilter = new PostFilter();
+        testFilter.setUserLat(gdansk.getLatitude());
+        testFilter.setUserLng(gdansk.getLongitude());
         testFilter.setRadius(200f);
         Specification<Post> spec = PostSpec.withFilters(testFilter, gdansk.getLatitude(), gdansk.getLongitude());
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());

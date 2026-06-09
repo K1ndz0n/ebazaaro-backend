@@ -50,59 +50,33 @@ public class PostService {
         return new PostResponse(post);
     }
 
-    public Post createPostObject(PostRequest request, User user) {
-        Post post = new Post();
-        post.setName(request.getName());
-        post.setDescription(request.getDescription());
-        post.setPhoneNumber(request.getPhoneNumber());
-        post.setEmail(request.getEmail());
-        post.setPrice(request.getPrice());
-        post.setCondition(request.getCondition());
-
-        post.setUser(user);
-        post.setCity(cityRepository.findById(request.getCityId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono miasta o podanym ID!")));
-
-        post.setCategory(categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono kategorii o podanym id!")));
-
-        return post;
-    }
-
     @Transactional
     public PostResponse createPost(PostRequest request, User user) {
-        Post post = createPostObject(request, user);
+        var city = cityRepository.findById(request.getCityId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie ma takiego miasta!"));
+
+        var category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie ma takiej kategorii!"));
+
+        Post post = new Post(request, user, city, category);
         return new PostResponse(postRepository.save(post));
-    }
-
-    public void updatePostObjectWithRequest(Post post, PostRequest request, User user) {
-        post.setName(request.getName());
-        post.setDescription(request.getDescription());
-        post.setPhoneNumber(request.getPhoneNumber());
-        post.setEmail(request.getEmail());
-        post.setPrice(request.getPrice());
-        post.setCondition(request.getCondition());
-
-        post.setUser(user);
-
-        post.setCity(cityRepository.findById(request.getCityId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono miasta o podanym ID!")));
-
-        post.setCategory(categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Nie znaleziono kategorii o podanym id!")));
     }
 
     @Transactional
     public PostResponse updatePost(PostRequest request, Long id, User user) {
         var post = postRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND
-                ));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         if (!post.getUser().getId().equals(user.getId()))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
-        updatePostObjectWithRequest(post, request, user);
+        var city = cityRepository.findById(request.getCityId())
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono miasta o podanym ID!"));
+
+        var category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono kategorii o podanym id!"));
+
+        post.update(request, city, category);
         return new PostResponse(post);
     }
 

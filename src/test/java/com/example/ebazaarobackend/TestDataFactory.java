@@ -16,71 +16,96 @@ public class TestDataFactory {
     @Autowired private ChatRepository chatRepository;
     @Autowired private CategoryRepository categoryRepository;
 
-    public User createUser(String username, String email) {
-        return userRepository.save(new User(username, email, "password"));
+    public User createUserObject(String username, String email) {
+        return new User(username, email, "password");
     }
 
-    public Post createPost(User user, String name, Category category, City city) {
+    public User createUser(String username, String email) {
+        return userRepository.save(createUserObject(username, email));
+    }
+
+    public Post createPostObject(User user, String name, Category category, City city) {
         Post post = new Post();
         post.setName(name);
         post.setEmail(user.getEmail());
         post.setPrice(0f);
         post.setCondition("new");
-
         post.setUser(user);
         post.setCategory(category);
         post.setCity(city);
-
-        return postRepository.save(post);
+        return post;
     }
 
-    public Photo createPhoto(Post post) {
+    public Post createPost(User user, String name, Category category, City city) {
+        return postRepository.save(createPostObject(user, name, category, city));
+    }
+
+    public Photo createPhotoObject(Post post) {
         Photo photo = new Photo();
         photo.setDisplayOrder(1);
         photo.setPost(post);
         photo.setPath("path");
-
-        return photoRepository.save(photo);
+        return photo;
     }
 
-    public Message createTextMessage(String text, User user, Chat chat) {
+    public Photo createPhoto(Post post) {
+        return photoRepository.save(createPhotoObject(post));
+    }
+
+    public Message createTextMessageObject(String text, User user, Chat chat) {
         Message message = new Message();
         message.setMessage(text);
         message.setIsTextMessage(true);
         message.setUser(user);
         message.setChat(chat);
-
-        return messageRepository.save(message);
+        return message;
     }
 
-    public Like createLike(User user, Post post) {
+    public Message createTextMessage(String text, User user, Chat chat) {
+        return messageRepository.save(createTextMessageObject(text, user, chat));
+    }
+
+    public Like createLikeObject(User user, Post post) {
         Like like = new Like();
         like.setPost(post);
         like.setUser(user);
-
-        return likeRepository.save(like);
+        return like;
     }
 
-    public City createCity(String name, String voivodeship, Float lat, Float lng) {
+    public Like createLike(User user, Post post) {
+        return likeRepository.save(createLikeObject(user, post));
+    }
+
+    public City createCityObject(String name, String voivodeship, Float lat, Float lng) {
         City city = new City();
         city.setName(name);
         city.setVoivodeship(voivodeship);
         city.setLatitude(lat);
         city.setLongitude(lng);
-
-        return cityRepository.save(city);
+        return city;
     }
 
-    public Chat createChat(Post post, User user) {
+    public City createCity(String name, String voivodeship, Float lat, Float lng) {
+        return cityRepository.save(createCityObject(name, voivodeship, lat, lng));
+    }
+
+    public Chat createChatObject(Post post, User user) {
         Chat chat = new Chat();
         chat.setPost(post);
         chat.setSeller(post.getUser());
         chat.setBuyer(user);
+        return chat;
+    }
 
-        return chatRepository.save(chat);
+    public Chat createChat(Post post, User user) {
+        return chatRepository.save(createChatObject(post, user));
+    }
+
+    public Category createCategoryObject(String name) {
+        return new Category(name);
     }
 
     public Category createCategory(String name) {
-        return categoryRepository.save(new Category(name));
+        return categoryRepository.save(createCategoryObject(name));
     }
 }

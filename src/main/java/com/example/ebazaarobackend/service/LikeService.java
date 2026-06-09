@@ -19,7 +19,7 @@ public class LikeService {
 
     @Transactional(readOnly = true)
     public boolean isLiked(User user, Long postId) {
-        var post = postRepository.findById(postId)
+        postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return likeRepository.existsByUserIdAndPostId(user.getId(), postId);
@@ -42,7 +42,7 @@ public class LikeService {
 
     @Transactional
     public void deleteLike(User user, Long postId) {
-        var post = postRepository.findById(postId)
+        postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         var like = likeRepository.findByUserIdAndPostId(user.getId(), postId)

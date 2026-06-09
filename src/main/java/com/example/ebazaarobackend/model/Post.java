@@ -1,5 +1,6 @@
 package com.example.ebazaarobackend.model;
 
+import com.example.ebazaarobackend.dto.PostRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,4 +61,29 @@ public class Post {
     private List<Photo> photos = new ArrayList<>();
 
     public Post() {}
+
+    public Post(PostRequest request, User user, City city, Category category) {
+        this.name = request.getName();
+        this.description = request.getDescription();
+        this.phoneNumber = request.getPhoneNumber();
+        this.email = request.getEmail();
+        this.price = request.getPrice();
+        this.condition = request.getCondition();
+
+        this.user = user;
+        this.city = city;
+        this.category = category;
+    }
+
+    public void update(PostRequest request, City city, Category category) {
+        this.name = request.getName();
+        this.description = request.getDescription();
+        this.phoneNumber = request.getPhoneNumber();
+        this.email = request.getEmail();
+        this.price = request.getPrice();
+        this.condition = request.getCondition();
+
+        this.city = city;
+        this.category = category;
+    }
 }

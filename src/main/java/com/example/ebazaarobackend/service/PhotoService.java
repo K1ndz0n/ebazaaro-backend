@@ -51,7 +51,6 @@ public class PhotoService {
             } else {
                 photoRepository.findById(p.getId()).ifPresent(photo -> {
                     photo.setDisplayOrder(p.getOrder());
-                    photoRepository.save(photo);
 
                     photosToDelete.removeIf(pt -> pt.getId().equals(photo.getId()));
                 });
